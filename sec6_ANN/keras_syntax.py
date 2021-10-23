@@ -39,7 +39,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 # print(y_test.shape)             # (300,)
 
 
-#########################################################################################
+#######################################################################################################################
 """ scaling/ normalzing """
 from sklearn.preprocessing import MinMaxScaler
 
@@ -58,8 +58,8 @@ X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 
 
-#########################################################################################
-#########################################################################################
+#######################################################################################################################
+#######################################################################################################################
 """ creating model - keras """
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -84,12 +84,13 @@ quick reaction on layers
 """
 model = Sequential()
 
-model.add(Dense(4, activation='relu'))
-model.add(Dense(4, activation='relu'))
-model.add(Dense(4, activation='relu'))
+model.add(Dense(4, activation='relu'))                          # layer 1 
+model.add(Dense(4, activation='relu'))                          # layer 2 
+model.add(Dense(4, activation='relu'))                          # layer 3 
 
 # Final output node for prediction
-model.add(Dense(1))
+model.add(Dense(1))                                             # layer 4 -> final layer -> output
+# print('num of layers:{}'.format(len(model.layers)))            # num of layers:4
 
 model.compile(optimizer='rmsprop', loss='mse')
 
@@ -160,12 +161,114 @@ plt.show()
 # sns.lineplot(x=range(len(loss)),y=loss)
 # plt.title("Training Loss per Epoch");
 
+#######################################################################################################################
+#######################################################################################################################
+""" Model Evaluation """
+
+training_score = model.evaluate(X_train, y_train, verbose=0)
+# print(training_score)           # 24.31159019470215
+
+test_score = model.evaluate(X_test,y_test,verbose=0)
+# print(test_score)               # 26.416053771972656
+
+
+test_predictions = model.predict(X_test)
+# print(test_predictions)
+test_predictions = pd.Series(test_predictions.reshape(300,))
+
+
+pred_df = pd.DataFrame(y_test, columns=['Test Y'])
+# print(pred_df)
+# #         Test Y
+# # 0    402.296319
+# # 1    624.156198
+# # 2    582.455066
+# # 3    578.588606
+# # 4    371.224104
+# # ..          ...
+# # 295  525.704657
+# # 296  502.909473
+# # 297  612.727910
+# # 298  417.569725
+# # 299  410.538250
+
+# # [300 rows x 1 columns]
+
+
+pred_df = pd.concat([pred_df, test_predictions], axis=1)
+pred_df.columns = ['Test Y','Model Predictions']
+# print(pred_df)
+# #         Test Y  Model Predictions
+# # 0    402.296319         421.510712
+# # 1    624.156198         608.720581
+# # 2    582.455066         582.896301
+# # 3    578.588606         562.156067
+# # 4    371.224104         383.460938
+# # ..          ...                ...
+# # 295  525.704657         525.489075
+# # 296  502.909473         507.554413
+# # 297  612.727910         597.360779
+# # 298  417.569725         433.809143
+# # 299  410.538250         424.434814
+
+# # [300 rows x 2 columns]
+
+
+# plot by predictions 
+sns.scatterplot(x='Test Y',y='Model Predictions',data=pred_df)
+plt.show()
+
+# pred_df['Error'] = pred_df['Test Y'] - pred_df['Model Predictions']
+# sns.distplot(pred_df['Error'],bins=50)
+
+
+
+""" MAE vs MSE """
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+mean_absolute_error(pred_df['Test Y'],pred_df['Model Predictions'])
+# print(mean_absolute_error(pred_df['Test Y'],pred_df['Model Predictions']))      # 4.107803803171395
+
+mean_squared_error(pred_df['Test Y'],pred_df['Model Predictions'])
+# print(mean_squared_error(pred_df['Test Y'],pred_df['Model Predictions']))       # 25.850322372690748
+mean_squared_error(pred_df['Test Y'],pred_df['Model Predictions']) ** 0.5
+# print(mean_squared_error(pred_df['Test Y'],pred_df['Model Predictions']) ** 0.5)    # 5.042244275641468
+
+
+# # Essentially the same thing, difference just due to precision
+# test_score
+# #RMSE
+# test_score ** 0.5
 
 
 
 
+#######################################################################################################################
+#######################################################################################################################
+""" Prediction on brand new data """
+# [[Feature1, Feature2]]
+new_gem = [[998,1000]]
+
+# Don't forget to scale!
+scaler.transform(new_gem)
+new_gem = scaler.transform(new_gem)
+# print(new_gem)            # [[0.14117652 0.53968792]]
+
+model.predict(new_gem)
+# print(model.predict(new_gem))           # [[420.43216]]
 
 
+
+#######################################################################################################################
+#######################################################################################################################
+""" saving & loading models """
+from tensorflow.keras.models import load_model
+
+model.save('my_model.h5')  # creates a HDF5 file 'my_model.h5'
+
+# load model .h5 
+later_model = load_model('my_model.h5')
+
+later_model.predict(new_gem)
 
 
 
