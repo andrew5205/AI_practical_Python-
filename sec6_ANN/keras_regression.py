@@ -6,7 +6,8 @@ import seaborn as sns
 
 df = pd.read_csv('./DATA/kc_house_data.csv')
 # print(df.head)
-# # <bound method NDFrame.head of                id        date     price  bedrooms  bathrooms  ...  zipcode      lat     long  sqft_living15  sqft_lot15
+# # <bound method NDFrame.head of                
+# #                id        date     price  bedrooms  bathrooms  ...  zipcode      lat     long  sqft_living15  sqft_lot15
 # # 0      7129300520  10/13/2014  221900.0         3       1.00  ...    98178  47.5112 -122.257           1340        5650
 # # 1      6414100192   12/9/2014  538000.0         3       2.25  ...    98125  47.7210 -122.319           1690        7639
 # # 2      5631500400   2/25/2015  180000.0         2       1.00  ...    98028  47.7379 -122.233           2720        8062
@@ -146,13 +147,13 @@ sns.scatterplot(x='long', y='lat', data=df, hue='price')
 # plt.close()
 
 
-df.sort_values('price',ascending=False).head(20)
+df.sort_values('price', ascending=False).head(20)
 # print(len(df))                  # 21597
 # print(len(df)*(0.01))           # 215.97
 
 
 # reset data frame - grab 99% from the buttom  
-non_top_1_perc = df.sort_values('price',ascending=False).iloc[216:]
+non_top_1_perc = df.sort_values('price', ascending=False).iloc[216:]
 plt.figure(figsize=(12,8))
 sns.scatterplot(x='long',y='lat', data=non_top_1_perc, hue='price', palette='RdYlGn', edgecolor=None, alpha=0.2)
 # plt.show()
@@ -161,6 +162,39 @@ sns.scatterplot(x='long',y='lat', data=non_top_1_perc, hue='price', palette='RdY
 sns.boxplot(x='waterfront',y='price',data=df)
 # plt.show()
 # plt.close()
+
+###################################################################################################################################
+###################################################################################################################################
+###################################################################################################################################
+""" feature engineering """
+
+df = df.drop('id', axis=1)
+
+""" common way to make datetime object """
+# print(df['date'])
+df['date'] = pd.to_datetime(df['date'])
+
+df['year'] = df['date'].apply(lambda date:date.year)
+# lambda function call => 
+# # def year_extration(date):
+# #     return date.year
+
+df['month'] = df['date'].apply(lambda date:date.month)
+
+# print(df.head())
+# #        date     price  bedrooms  bathrooms  sqft_living  sqft_lot  ...      lat     long  sqft_living15  sqft_lot15  year  month
+# # 0 2014-10-13  221900.0         3       1.00         1180      5650  ...  47.5112 -122.257           1340        5650  2014     10
+# # 1 2014-12-09  538000.0         3       2.25         2570      7242  ...  47.7210 -122.319           1690        7639  2014     12
+# # 2 2015-02-25  180000.0         2       1.00          770     10000  ...  47.7379 -122.233           2720        8062  2015      2
+# # 3 2014-12-09  604000.0         4       3.00         1960      5000  ...  47.5208 -122.393           1360        5000  2014     12
+# # 4 2015-02-18  510000.0         3       2.00         1680      8080  ...  47.6168 -122.045           1800        7503  2015      2
+
+# # [5 rows x 22 columns]
+###################################################################################################################################
+
+plt.figure('price vs year', figsize=(10,6))
+sns.boxplot(x='year', y='price', data=df)
+# plt.show()
 
 
 
