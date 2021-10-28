@@ -217,21 +217,71 @@ df['sqft_basement'].value_counts()
 ###################################################################################################################################
 ###################################################################################################################################
 
+""" split test/ train"""
+X = df.drop('price',axis=1)
+y = df['price']
+
+# # return as numpy, in case tf complains while validation_data 
+# X = df.drop('price',axis=1).values
+# # print(X)
+# y = df['price'].values
+# # print(y)
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=101)
+
+
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+
+# fit + transfor in one step 
+X_train= scaler.fit_transform(X_train)
+# no need to fit in test set 
+X_test = scaler.transform(X_test)
+
+# print(X_train.shape)                    # (15117, 19)
+# print(X_test.shape)                     # (6480, 19)
 
 
 
+""" creat model """
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.optimizers import Adam
+
+model = Sequential()
+
+# based on X_train.shape, we have 19 incoming features, 
+# nice to have 19 neurons for one layer as well 
+model.add(Dense(19,activation='relu'))
+model.add(Dense(19,activation='relu'))
+model.add(Dense(19,activation='relu'))
+model.add(Dense(19,activation='relu'))
+model.add(Dense(1))
+
+model.compile(optimizer='adam',loss='mse')
 
 
+# validation_data() only for checking purposes, wont affect test and train data set 
+model.fit(x=X_train, y=y_train.values, validation_data=(X_test, y_test.values), batch_size=128, epochs=400)
 
+# Epoch 1/400
+# 119/119 [==============================] - 1s 2ms/step - loss: 430233059328.0000 - val_loss: 418875146240.0000
+# Epoch 2/400
+# 119/119 [==============================] - 0s 1ms/step - loss: 428618416128.0000 - val_loss: 413279551488.0000
+# ... 
+# Epoch 399/400
+# 119/119 [==============================] - 0s 1ms/step - loss: 28788975616.0000 - val_loss: 26365681664.0000
+# Epoch 400/400
+# 119/119 [==============================] - 0s 1ms/step - loss: 28769007616.0000 - val_loss: 26328829952.0000
 
+losses = pd.DataFrame(model.history.history)
+losses.plot()
+plt.show()
 
-
-
-
-
-
-
-
+###################################################################################################################################
+###################################################################################################################################
+###################################################################################################################################
 
 
 
