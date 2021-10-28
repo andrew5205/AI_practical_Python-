@@ -197,6 +197,43 @@ sns.boxplot(x='year', y='price', data=df)
 # plt.show()
 
 
+""" why this df.plot()"""
+df.groupby('month').mean()['price'].plot()
+df.groupby('year').mean()['price'].plot()
+# plt.show()
+df = df.drop('date',axis=1)
+
+# df['zipcode'].value_counts()
+df = df.drop('zipcode',axis=1)
+
+#  could make sense due to scaling, higher should correlate to more value
+df['yr_renovated'].value_counts()
+
+df.head()
+
+
+df['sqft_basement'].value_counts()
+###################################################################################################################################
+###################################################################################################################################
+###################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
