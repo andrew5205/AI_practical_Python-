@@ -276,20 +276,95 @@ model.fit(x=X_train, y=y_train.values, validation_data=(X_test, y_test.values), 
 # 119/119 [==============================] - 0s 1ms/step - loss: 28769007616.0000 - val_loss: 26328829952.0000
 
 losses = pd.DataFrame(model.history.history)
+print(losses)
 losses.plot()
-plt.show()
+# plt.show()
 
 ###################################################################################################################################
 ###################################################################################################################################
 ###################################################################################################################################
 
+""" evaluation """
+
+from sklearn.metrics import mean_squared_error,mean_absolute_error,explained_variance_score
 
 
 
+X_test
+predictions = model.predict(X_test)
+
+mean_absolute_error(y_test,predictions)                 # 101666.74811137635
+
+np.sqrt(mean_squared_error(y_test,predictions))         # 162549.26352210157
+
+explained_variance_score(y_test,predictions)            # 0.8009472831860807
+
+
+# print(df['price'].mean())              # 540296.5735055795
+# print(df['price'].median())            # 450000.0
+# print(df['price'].describe())
+# # count    2.159700e+04
+# # mean     5.402966e+05
+# # std      3.673681e+05
+# # min      7.800000e+04
+# # 25%      3.220000e+05
+# # 50%      4.500000e+05
+# # 75%      6.450000e+05
+# # max      7.700000e+06
+# # Name: price, dtype: float64
+
+# Our predictions
+plt.figure(figsize=(12,6))
+plt.scatter(y_test, predictions)
+# plt.show()
+
+# Perfect predictions
+plt.plot(y_test,y_test,'r')
+# plt.show()
+
+
+errors = y_test.values.reshape(6480, 1) - predictions
+sns.distplot(errors)
+# plt.show()
 
 
 
+""" predicting on brand now data """
+single_house = df.drop('price',axis=1).iloc[0]
+# print(single_house)
 
+single_house = scaler.transform(single_house.values.reshape(-1, 19))
+# print(single_house)
+# # [[0.2        0.08       0.08376422 0.00310751 0.         0.
+# #   0.         0.5        0.4        0.10785619 0.         0.47826087
+# #   0.         0.57149751 0.21760797 0.16193426 0.00582059 0.
+# #   0.81818182]]
 
+model.predict(single_house)
+# print(model.predict(single_house))          # array([[283862.12]], dtype=float32)
+
+df.iloc[0]
+# print(df.iloc[0])
+# # price            221900.0000
+# # bedrooms              3.0000
+# # bathrooms             1.0000
+# # sqft_living        1180.0000
+# # sqft_lot           5650.0000
+# # floors                1.0000
+# # waterfront            0.0000
+# # view                  0.0000
+# # condition             3.0000
+# # grade                 7.0000
+# # sqft_above         1180.0000
+# # sqft_basement         0.0000
+# # yr_built           1955.0000
+# # yr_renovated          0.0000
+# # lat                  47.5112
+# # long               -122.2570
+# # sqft_living15      1340.0000
+# # sqft_lot15         5650.0000
+# # year               2014.0000
+# # month                10.0000
+# # Name: 0, dtype: float64
 
 
