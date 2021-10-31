@@ -106,7 +106,7 @@ plt.xlim(0,45000)
 heatmap: https://seaborn.pydata.org/generated/seaborn.heatmap.html#seaborn.heatmap 
 resizing: https://stackoverflow.com/questions/56942670/matplotlib-seaborn-first-and-last-row-cut-in-half-of-heatmap-plot 
 """
-plt.figure(figsize=(12,7))
+plt.figure('heatmap', figsize=(12,7))
 sns.heatmap(df.corr(), annot=True, cmap='viridis')
 plt.ylim(10, 0)
 # plt.show()
@@ -147,14 +147,62 @@ df.groupby('loan_status')['loan_amnt'].describe()
 
 
 
+# TASK: Let's explore the Grade and SubGrade columns that LendingClub attributes to the loans. 
+# What are the unique possible grades and subgrades?
+sorted(df['grade'].unique())
+sorted(df['sub_grade'].unique())
 
 
 
+# Create a countplot per grade. Set the hue to the loan_status label
+plt.figure('grade VS loan status', figsize=(12,7))
+sns.countplot(x='grade', data=df, hue='loan_status')
+plt.show()
 
 
 
+# TASK: Display a count plot per subgrade. You may need to resize for this plot and reorder the x axis. 
+# Feel free to edit the color palette. 
+# Explore both all loans made per subgrade as well being separated based on the loan_status
+plt.figure('subgrade',figsize=(12,4))
+subgrade_order = sorted(df['sub_grade'].unique())
+sns.countplot(x='sub_grade', data=df, order = subgrade_order, palette='coolwarm')
+plt.show()
 
 
+plt.figure('subgrade with hue ',figsize=(12,4))
+subgrade_order = sorted(df['sub_grade'].unique())
+sns.countplot(x='sub_grade', data=df, order = subgrade_order, palette='coolwarm', hue='loan_status')
+plt.show()
+
+
+
+# It looks like F and G subgrades don't get paid back that often. 
+# Isloate those and recreate the countplot just for those subgrades
+f_and_g = df[(df['grade']=='G') | (df['grade']=='F')]
+
+plt.figure(figsize=(12,4))
+subgrade_order = sorted(f_and_g['sub_grade'].unique())
+sns.countplot(x='sub_grade',data=f_and_g,order = subgrade_order,hue='loan_status')
+plt.show()
+
+
+
+# Create a new column called 'load_repaid' which will contain a 1 if the loan status was "Fully Paid" and a 0 if it was "Charged Off"
+df['loan_status'].unique()
+df['loan_repaid'] = df['loan_status'].map({'Fully Paid':1, 'Charged Off':0})
+df[['loan_repaid','loan_status']]
+
+# (Note this is hard, but can be done in one line!) 
+# Create a bar plot showing the correlation of the numeric features to the new loan_repaid column. 
+# [Helpful Link](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.plot.bar.html)
+plt.figure('loan repaid corr', figsize=(12,7))
+df.corr()['loan_repaid'].sort_values().drop('loan_repaid').plot(kind='bar')
+plt.show()
+
+###################################################################################################################################
+###################################################################################################################################
+###################################################################################################################################
 
 
 
