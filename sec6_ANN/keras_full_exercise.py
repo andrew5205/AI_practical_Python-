@@ -203,6 +203,124 @@ plt.show()
 ###################################################################################################################################
 ###################################################################################################################################
 ###################################################################################################################################
+""" pre processing data """
+
+# print(df.head())
+# #    loan_amnt        term  int_rate  ...  pub_rec_bankruptcies                                            address loan_repaid
+# # 0    10000.0   36 months     11.44  ...                   0.0     0174 Michelle Gateway\r\nMendozaberg, OK 22690           1
+# # 1     8000.0   36 months     11.99  ...                   0.0  1076 Carney Fort Apt. 347\r\nLoganmouth, SD 05113           1
+# # 2    15600.0   36 months     10.49  ...                   0.0  87025 Mark Dale Apt. 269\r\nNew Sabrina, WV 05113           1
+# # 3     7200.0   36 months      6.49  ...                   0.0            823 Reid Ford\r\nDelacruzside, MA 00813           1
+# # 4    24375.0   60 months     17.27  ...                   0.0             679 Luna Roads\r\nGreggshire, VA 11650           0
+
+
+# print(len(df))          # 396030
+
+
+# # check for missing data 
+# print(df.isnull().sum())
+# # loan_amnt                   0
+# # term                        0
+# # int_rate                    0
+# # installment                 0
+# # grade                       0
+# # sub_grade                   0
+# # emp_title               22927
+# # emp_length              18301
+# # home_ownership              0
+# # annual_inc                  0
+# # verification_status         0
+# # issue_d                     0
+# # loan_status                 0
+# # purpose                     0
+# # title                    1755
+# # dti                         0
+# # earliest_cr_line            0
+# # open_acc                    0
+# # pub_rec                     0
+# # revol_bal                   0
+# # revol_util                276
+# # total_acc                   0
+# # initial_list_status         0
+# # application_type            0
+# # mort_acc                37795
+# # pub_rec_bankruptcies      535
+# # address                     0
+# # loan_repaid                 0
+# # dtype: int64
+
+
+# print(100* df.isnull().sum()/len(df))
+
+
+""" How many unique employment job titles are there? """
+feat_info('emp_title')  
+# The job title supplied by the Borrower when applying for the loan.*
+
+print('\n')
+feat_info('emp_length')
+# Employment length in years. Possible values are between 0 and 10 where 0 means less than one year and 10 means ten or more years.
+
+
+
+""" To check unique items """
+df['emp_title'].nunique()           # 173105
+
+df['emp_title'].value_counts()
+# print(df['emp_title'].value_counts())
+# # Teacher                                     4389
+# # Manager                                     4250
+# # Registered Nurse                            1856
+# # RN                                          1846
+# # Supervisor                                  1830
+# #                                             ... 
+# # Lender Specialist                              1
+# # NEC Laboratories America, Inc                  1
+# # Sr. Nuclear Health Physicist                   1
+# # Texas Health Center for Diagnostics and        1
+# # United Stated Dept of Treasury, CC Offic       1
+# # Name: emp_title, Length: 173105, dtype: int64
+
+
+
+
+
+""" Realistically there are too many unique job titles to try to convert this to a dummy variable feature. 
+Let's remove that emp_title column. """ 
+df = df.drop('emp_title', axis=1)
+
+
+
+""" Create a count plot of the emp_length feature column. Challenge: Sort the order of the values """ 
+sorted(df['emp_length'].dropna().unique())
+
+# print(sorted(df['emp_length'].dropna().unique()))
+emp_length_order = [ '< 1 year',
+                    '1 year','2 years','3 years','4 years','5 years',
+                    '6 years','7 years','8 years','9 years','10+ years'
+                    ]
+
+
+plt.figure('emp_length with ordered',figsize=(12,4))
+sns.countplot(x='emp_length', data=df, order=emp_length_order)
+plt.show()
+
+
+
+""" Plot out the countplot with a hue separating Fully Paid vs Charged Off"""
+plt.figure('emp length vs loan status',figsize=(12,4))
+sns.countplot(x='emp_length', data=df, order=emp_length_order, hue='loan_status')
+plt.show()
+
+
+
+
+
+
+
+
+
+plt.close()
 
 
 
