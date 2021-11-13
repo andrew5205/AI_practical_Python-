@@ -310,8 +310,87 @@ plt.show()
 """ Plot out the countplot with a hue separating Fully Paid vs Charged Off"""
 plt.figure('emp length vs loan status',figsize=(12,4))
 sns.countplot(x='emp_length', data=df, order=emp_length_order, hue='loan_status')
+# plt.show()
+
+
+plt.figure(figsize=(12,4))
+sns.countplot(x='emp_length', data=df, order=emp_length_order)
+# plt.show()
+
+
+
+""" Plot out the countplot with a hue separating Fully Paid vs Charged Off """ 
+plt.figure(figsize=(12,4))
+sns.countplot(x='emp_length',data=df,order=emp_length_order,hue='loan_status')
 plt.show()
 
+
+
+""" This still doesn't really inform us if there is a strong relationship between employment length and being charged off, 
+what we want is the percentage of charge offs per category. 
+Essentially informing us what percent of people per employment category didn't pay back their loan. 
+There are a multitude of ways to create this Series. 
+Once you've created it, see if visualize it with a [bar plot](https://pandas.pydata.org/pandas-docs/version/0.23.4/generated/pandas.DataFrame.plot.html). 
+This may be tricky, refer to solutions if you get stuck on creating this Series """ 
+
+emp_co = df[df['loan_status'] == "Charged Off"].groupby("emp_length").count()['loan_status']
+
+emp_fp = df[df['loan_status'] == "Fully Paid"].groupby("emp_length").count()['loan_status']
+
+emp_len = emp_co/emp_fp
+# print(emp_len)
+# # emp_length
+# # 1 year       0.248649
+# # 10+ years    0.225770
+# # 2 years      0.239560
+# # 3 years      0.242593
+# # 4 years      0.238213
+# # 5 years      0.237911
+# # 6 years      0.233341
+# # 7 years      0.241887
+# # 8 years      0.249625
+# # 9 years      0.250735
+# # < 1 year     0.260830
+# # Name: loan_status, dtype: float64
+
+emp_len.plot(kind='bar')
+# plt.show()
+
+
+""" Revisit the DataFrame to see what feature columns still have missing data. """ 
+df = df.drop('emp_length',axis=1)
+# print(df.isnull().sum())
+# # loan_amnt                   0
+# # term                        0
+# # int_rate                    0
+# # installment                 0
+# # grade                       0
+# # sub_grade                   0
+# # home_ownership              0
+# # annual_inc                  0
+# # verification_status         0
+# # issue_d                     0
+# # loan_status                 0
+# # purpose                     0
+# # title                    1755
+# # dti                         0
+# # earliest_cr_line            0
+# # open_acc                    0
+# # pub_rec                     0
+# # revol_bal                   0
+# # revol_util                276
+# # total_acc                   0
+# # initial_list_status         0
+# # application_type            0
+# # mort_acc                37795
+# # pub_rec_bankruptcies      535
+# # address                     0
+# # loan_repaid                 0
+# # dtype: int64
+
+###################################################################################################################################
+###################################################################################################################################
+###################################################################################################################################
 
 
 
