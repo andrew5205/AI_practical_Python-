@@ -391,6 +391,140 @@ df = df.drop('emp_length',axis=1)
 ###################################################################################################################################
 ###################################################################################################################################
 ###################################################################################################################################
+"""" deal with missing data """
+
+# # check repeated information
+# print(df['purpose'].head(10))
+# feat_info('purpose')
+# print(df['title'].head(10))
+
+
+""" The title column is simply a string subcategory/description of the purpose column. 
+Go ahead and drop the title column.
+""" 
+df = df.drop('title',axis=1)
+
+
+""" This is one of the hardest parts of the project! Refer to the solutions video if you need guidance, 
+feel free to fill or drop the missing values of the mort_acc however you see fit! 
+Here we're going with a very specific approach.
+
+Find out what the mort_acc feature represents
+""" 
+feat_info('mort_acc')
+# print(df['mort_acc'].value_counts())
+# # 0.0     139777
+# # 1.0      60416
+# # 2.0      49948
+# # 3.0      38049
+
+# # show more (open the raw output data in a text editor) ...
+
+
+# # 28.0         1
+# # 34.0         1
+# # Name: mort_acc, dtype: int64
+
+
+
+
+print("Correlation with the mort_acc column")
+# print(df.corr()['mort_acc'].sort_values())
+# # Correlation with the mort_acc column
+# # int_rate               -0.082583
+# # dti                    -0.025439
+# # revol_util              0.007514
+# # pub_rec                 0.011552
+# # pub_rec_bankruptcies    0.027239
+# # loan_repaid             0.073111
+# # open_acc                0.109205
+# # installment             0.193694
+# # revol_bal               0.194925
+# # loan_amnt               0.222315
+# # annual_inc              0.236320
+# # total_acc               0.381072
+# # mort_acc                1.000000
+# # Name: mort_acc, dtype: float64
+
+
+
+""" 
+Looks like the total_acc feature correlates with the mort_acc , this makes sense! Let's try this fillna() approach. 
+We will group the dataframe by the total_acc and calculate the mean value for the mort_acc per total_acc entry. 
+To get the result below:
+"""
+print("Mean of mort_acc column per total_acc")
+# print(df.groupby('total_acc').mean()['mort_acc'])
+# # Mean of mort_acc column per total_acc
+# # total_acc
+# # 2.0      0.000000
+# # 3.0      0.052023
+# # 4.0      0.066743
+# #            ...   
+# # 150.0    2.000000
+# # 151.0    0.000000
+# # Name: mort_acc, Length: 118, dtype: float64
+
+
+
+""" 
+Let's fill in the missing mort_acc values based on their total_acc value. 
+If the mort_acc is missing, then we will fill in that missing value with the mean value corresponding to its total_acc value from the Series we created above. 
+This involves using an .apply() method with two columns. Check out the link below for more info, or review the solutions video/notebook.**
+
+[Helpful Link](https://stackoverflow.com/questions/13331698/how-to-apply-a-function-to-two-columns-of-pandas-dataframe) 
+"""
+
+total_acc_avg = df.groupby('total_acc').mean()['mort_acc']
+# print(total_acc_avg[2.0])           # 0.0
+
+def fill_mort_acc(total_acc, mort_acc):
+    '''
+    Accepts the total_acc and mort_acc values for the row.
+    Checks if the mort_acc is NaN , if so, it returns the avg mort_acc value
+    for the corresponding total_acc value for that row.
+    
+    total_acc_avg here should be a Series or dictionary containing the mapping of the
+    groupby averages of mort_acc per total_acc values.
+    '''
+    if np.isnan(mort_acc):
+        return total_acc_avg[total_acc]
+    else:
+        return mort_acc
+
+
+df['mort_acc'] = df.apply(lambda x: fill_mort_acc(x['total_acc'], x['mort_acc']), axis=1)
+# print(df.isnull().sum())
+# # Loan_amnt                 0
+# # term                      0
+# # int_rate                  0
+# # installment               0
+# # grade                     0
+# # sub_grade                 0
+# # home_ownership            0
+# # annual_inc                0
+# # verification_status       0
+# # issue_d                   0
+# # loan_status               0
+# # purpose                   0
+# # dti                       0
+# # earliest_cr_line          0
+# # open_acc                  0
+# # pub_rec                   0
+# # revol_bal                 0
+# # revol_util              276
+# # total_acc                 0
+# # initial_list_status       0
+# # application_type          0
+# # mort_acc                  0
+# # pub_rec_bankruptcies    535
+# # address                   0
+# # loan_repaid               0
+# # dtype: int64
+
+
+
+
 
 
 
