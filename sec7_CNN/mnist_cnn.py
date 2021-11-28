@@ -161,6 +161,69 @@ x_train = x_train.reshape(60000, 28, 28, 1)
 x_test = x_test.reshape(10000,28,28,1)
 # print(x_test.shape)             # (10000, 28, 28, 1)
 
+#########################################################################################################################
+################                            Creating and Training data            #######################################
+#########################################################################################################################
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D, Flatten
+
+
+model = Sequential()
+
+# CONVOLUTIONAL LAYER - filter = pow of 2 
+# https://stackoverflow.com/questions/37674306/what-is-the-difference-between-same-and-valid-padding-in-tf-nn-max-pool-of-t
+model.add(Conv2D(filters=32, kernel_size=(4,4), input_shape=(28, 28, 1), activation='relu'))
+
+# POOLING LAYER
+model.add(MaxPool2D(pool_size=(2, 2)))
+
+# FLATTEN IMAGES FROM 28 by 28 to 764 BEFORE FINAL LAYER
+model.add(Flatten())
+
+# 128 NEURONS IN DENSE HIDDEN LAYER (YOU CAN CHANGE THIS NUMBER OF NEURONS)
+model.add(Dense(128, activation='relu'))
+
+# LAST LAYER IS THE CLASSIFIER, THUS 10 POSSIBLE CLASSES
+model.add(Dense(10, activation='softmax'))
+
+# https://keras.io/metrics/
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# we can add in additional metrics https://keras.io/metrics/
+
+
+
+
+from tensorflow.keras.callbacks import EarlyStopping
+early_stop = EarlyStopping(monitor='val_loss', patience=2)
+
+# Train the model
+model.fit(x_train, y_cat_train, epochs=10, validation_data=(x_test, y_cat_test), callbacks=[early_stop])
+
+#  (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+# To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+# 2021-11-27 19:14:52.303280: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:176] None of the MLIR Optimization Passes are enabled (registered 2)
+# Epoch 1/10
+# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.1376 - accuracy: 0.9577 - val_loss: 0.0452 - val_accuracy: 0.9850
+# Epoch 2/10
+# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.0472 - accuracy: 0.9856 - val_loss: 0.0477 - val_accuracy: 0.9844
+# Epoch 3/10
+# 1875/1875 [==============================] - 12s 7ms/step - loss: 0.0295 - accuracy: 0.9909 - val_loss: 0.0418 - val_accuracy: 0.9878
+# Epoch 4/10
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0210 - accuracy: 0.9932 - val_loss: 0.0378 - val_accuracy: 0.9885
+# Epoch 5/10
+# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.0144 - accuracy: 0.9954 - val_loss: 0.0468 - val_accuracy: 0.9863
+# Epoch 6/10
+# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.0114 - accuracy: 0.9965 - val_loss: 0.0385 - val_accuracy: 0.9881
+
+
+
+
+
+
+
+
+
+
 
 
 
