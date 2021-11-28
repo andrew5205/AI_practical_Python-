@@ -201,19 +201,23 @@ model.fit(x_train, y_cat_train, epochs=10, validation_data=(x_test, y_cat_test),
 
 #  (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
 # To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-# 2021-11-27 19:14:52.303280: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:176] None of the MLIR Optimization Passes are enabled (registered 2)
+# 2021-11-27 19:35:54.381419: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:176] None of the MLIR Optimization Passes are enabled (registered 2)
 # Epoch 1/10
-# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.1376 - accuracy: 0.9577 - val_loss: 0.0452 - val_accuracy: 0.9850
+# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.1344 - accuracy: 0.9613 - val_loss: 0.0514 - val_accuracy: 0.9827
 # Epoch 2/10
-# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.0472 - accuracy: 0.9856 - val_loss: 0.0477 - val_accuracy: 0.9844
+# 1875/1875 [==============================] - 12s 7ms/step - loss: 0.0470 - accuracy: 0.9852 - val_loss: 0.0422 - val_accuracy: 0.9872
 # Epoch 3/10
-# 1875/1875 [==============================] - 12s 7ms/step - loss: 0.0295 - accuracy: 0.9909 - val_loss: 0.0418 - val_accuracy: 0.9878
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0303 - accuracy: 0.9909 - val_loss: 0.0386 - val_accuracy: 0.9865
 # Epoch 4/10
-# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0210 - accuracy: 0.9932 - val_loss: 0.0378 - val_accuracy: 0.9885
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0198 - accuracy: 0.9936 - val_loss: 0.0386 - val_accuracy: 0.9880
 # Epoch 5/10
-# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.0144 - accuracy: 0.9954 - val_loss: 0.0468 - val_accuracy: 0.9863
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0144 - accuracy: 0.9952 - val_loss: 0.0400 - val_accuracy: 0.9893
 # Epoch 6/10
-# 1875/1875 [==============================] - 12s 6ms/step - loss: 0.0114 - accuracy: 0.9965 - val_loss: 0.0385 - val_accuracy: 0.9881
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0107 - accuracy: 0.9964 - val_loss: 0.0378 - val_accuracy: 0.9889
+# Epoch 7/10
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0091 - accuracy: 0.9972 - val_loss: 0.0405 - val_accuracy: 0.9885
+# Epoch 8/10
+# 1875/1875 [==============================] - 13s 7ms/step - loss: 0.0067 - accuracy: 0.9979 - val_loss: 0.0547 - val_accuracy: 0.9873
 
 
 
@@ -221,9 +225,98 @@ model.fit(x_train, y_cat_train, epochs=10, validation_data=(x_test, y_cat_test),
 
 
 
+#########################################################################################################################
+################                            Evaluate the model             ##############################################
+#########################################################################################################################
+
+
+# print(model.metrics_names)          # ['loss', 'accuracy']
+
+
+losses = pd.DataFrame(model.history.history)
+print(losses.head())
+#        loss  accuracy  val_loss  val_accuracy
+# 0  0.134416  0.961283  0.051389        0.9827
+# 1  0.046999  0.985167  0.042220        0.9872
+# 2  0.030254  0.990900  0.038646        0.9865
+# 3  0.019847  0.993633  0.038632        0.9880
+# 4  0.014387  0.995250  0.039987        0.9893
+
+
+losses[['accuracy', 'val_accuracy']].plot()
+# plt.show()
+
+
+losses[['loss', 'val_loss']].plot()
+plt.show()
+
+print(model.metrics_names)                                  # ['loss', 'accuracy']
+print(model.evaluate(x_test, y_cat_test, verbose=0))        # [0.054672058671712875, 0.9872999787330627]
+
+
+from sklearn.metrics import classification_report, confusion_matrix
+predictions = model.predict_classes(x_test)
+
+print(y_cat_test.shape)         # (10000, 10)
+
+print(y_cat_test[0])            # array([0., 0., 0., 0., 0., 0., 0., 1., 0., 0.], dtype=float32)
+
+print(predictions[0])           # 7
+
+print(y_test)                   # array([7, 2, 1, ..., 4, 5, 6], dtype=uint8)
 
 
 
 
+print(classification_report(y_test, predictions))
+#               precision    recall  f1-score   support
 
+#            0       0.99      0.99      0.99       980
+#            1       1.00      0.99      0.99      1135
+#            2       0.98      0.99      0.98      1032
+#            3       0.97      0.99      0.98      1010
+#            4       1.00      0.98      0.99       982
+#            5       0.98      0.99      0.99       892
+#            6       0.98      0.99      0.99       958
+#            7       0.99      0.98      0.99      1028
+#            8       0.99      0.98      0.98       974
+#            9       0.98      0.98      0.98      1009
+
+#     accuracy                           0.99     10000
+#    macro avg       0.99      0.99      0.99     10000
+# weighted avg       0.99      0.99      0.99     10000
+
+
+
+print(confusion_matrix(y_test,predictions))
+# [[ 975    0    1    0    0    0    2    1    1    0]
+#  [   0 1122    1    4    0    1    4    1    2    0]
+#  [   6    1 1013    1    1    0    0    5    5    0]
+#  [   0    0    1 1003    0    2    0    0    4    0]
+#  [   0    0    0    0  978    0    0    0    0    4]
+#  [   2    0    1   16    0  869    3    0    1    0]
+#  [   8    1    0    0    2    1  943    0    3    0]
+#  [   0    0    6    1    0    0    0 1013    2    6]
+#  [   2    0    1    0    1    0    0    0  965    5]
+#  [   4    0    0    1    6    1    0    3    2  992]]
+
+
+import seaborn as sns
+plt.figure(figsize=(10,6))
+sns.heatmap(confusion_matrix(y_test,predictions), annot=True)
+# https://github.com/matplotlib/matplotlib/issues/14751
+# plt.show()
+
+
+
+
+""" 
+# Predicting a given image
+"""
+my_number = x_test[0]
+plt.imshow(my_number.reshape(28,28))
+plt.show()
+
+# SHAPE --> (num_images, width, height, color_channels)
+model.predict_classes(my_number.reshape(1, 28, 8, 1))             # array([7], dtype=int64)
 
