@@ -132,16 +132,85 @@ model.fit(x_train, y_cat_train, epochs=15, validation_data=(x_test, y_cat_test),
 
 
 
+# Careful, don't overwrite our file!
+# model.save('cifar_10epochs.h5')
+losses = pd.DataFrame(model.history.history)
+# print(losses.head())
+#         #     loss  accuracy  val_loss  val_accuracy
+#         # 0  1.507017   0.46126  1.364891        0.5128
+#         # 1  1.149331   0.59610  1.169666        0.5890
+#         # 2  0.994966   0.65474  1.177166        0.5921
+#         # 3  0.888658   0.69388  1.002123        0.6636
+#         # 4  0.810752   0.72122  1.073580        0.6366
+
+
+losses[['accuracy', 'val_accuracy']].plot()
+
+losses[['loss', 'val_loss']].plot()
+plt.show()
+
+
+# print(model.metrics_names)          # ['loss', 'accuracy']
+# print(model.evaluate(x_test,y_cat_test,verbose=0))                    # [1.0987777906417846, 0.6544]
 
 
 
+from sklearn.metrics import classification_report, confusion_matrix
+
+predictions = model.predict_classes(x_test)
+# print(classification_report(y_test, predictions))
+# #                 precision    recall  f1-score   support
+
+# #            0       0.68      0.67      0.67      1000
+# #            1       0.81      0.77      0.79      1000
+# #            2       0.48      0.61      0.54      1000
+# #            3       0.54      0.39      0.46      1000
+# #            4       0.70      0.55      0.61      1000
+# #            5       0.55      0.61      0.58      1000
+# #            6       0.74      0.76      0.75      1000
+# #            7       0.88      0.55      0.68      1000
+# #            8       0.58      0.92      0.71      1000
+# #            9       0.77      0.71      0.74      1000
+
+# #     accuracy                           0.65     10000
+# #    macro avg       0.67      0.65      0.65     10000
+# # weighted avg       0.67      0.65      0.65     10000
 
 
 
+confusion_matrix(y_test, predictions)
+# print(confusion_matrix(y_test, predictions))
+#         # array([[665,  25,  50,   5,   8,   9,   9,   3, 206,  20],
+#         # [ 22, 769,  13,   9,   1,   5,  10,   1, 105,  65],
+#         # [ 83,   8, 613,  35,  45,  71,  60,   9,  59,  17],
+#         # [ 34,  22, 138, 394,  48, 210,  62,  11,  58,  23],
+#         # [ 41,   4, 145,  49, 550,  58,  67,  24,  54,   8],
+#         # [ 20,   7,  99, 131,  37, 614,  39,  16,  25,  12],
+#         # [ 15,  10,  74,  52,  30,  19, 757,   1,  30,  12],
+#         # [ 32,   7, 104,  44,  69, 122,  12, 548,  23,  39],
+#         # [ 27,  13,  14,   4,   3,   3,   1,   0, 924,  11],
+#         # [ 39,  89,  17,   8,   0,   9,   3,   7, 118, 710]], dtype=int64)
 
 
+import seaborn as sns
+plt.figure(figsize=(10,6))
+sns.heatmap(confusion_matrix(y_test,predictions), annot=True)
+# https://github.com/matplotlib/matplotlib/issues/14751
 
 
+""" # Predicting a given image """
+my_image = x_test[16]
+plt.imshow(my_image)
+
+# print(y_test[16])
+
+
+# SHAPE --> (num_images,width,height,color_channels)
+model.predict_classes(my_image.reshape(1,32,32,3))
+
+
+# 5 is DOG
+# https://www.cs.toronto.edu/~kriz/cifar.html
 
 
 
